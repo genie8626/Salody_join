@@ -1,0 +1,55 @@
+package org.Salody.controller;
+
+
+import javax.servlet.http.HttpSession;
+
+import org.Salody.DTO.memberDTO;
+import org.Salody.Service.MemberService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+public class MemberController {
+	private static final Logger logger = LoggerFactory.getLogger(MemberController.class);
+	@Autowired
+	MemberService mservice;
+	@RequestMapping(value="/Salody_Join", method = RequestMethod.GET)
+	public void Getwrite() {
+		logger.info("write");
+	}
+	@RequestMapping(value="/write", method= RequestMethod.POST)
+	public String Postwrite(memberDTO mdto) {
+		mservice.Postwrite(mdto);
+		return "redirect:/Salody_Join";
+	}
+	@RequestMapping(value = "/Salody_Mypage", method = RequestMethod.GET)
+	public void GetMypage(memberDTO mdto, Model model) {
+		model.addAttribute("Mypage", mservice.GetMypage(mdto));
+	}
+	
+	@RequestMapping(value = "/Member_Login", method = RequestMethod.GET)
+	public void memberlogin() {
+	}
+	@RequestMapping(value = "/Member_LoginPost", method = RequestMethod.POST)
+	public String mlogin(memberDTO mdto, RedirectAttributes rttr,HttpSession session) {
+	
+		memberDTO result=mservice.mlogin(mdto);
+		logger.info("abcd");
+		if(result==null) {
+			//rttr.addAttribute("check", "fail");
+			rttr.addFlashAttribute("check", "fail");
+			return "redirect:/member/login";
+		}else {
+			session.setAttribute("loginId", result.getId());
+			return "redirect:/board/list";
+		} 
+	}
+}
+
+	
